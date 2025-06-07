@@ -1,5 +1,6 @@
 package br.com.Kofflix.KFX;
 
+import br.com.Kofflix.KFX.models.EpisodesDados;
 import br.com.Kofflix.KFX.models.SeriesDados;
 import br.com.Kofflix.KFX.service.ConsumoApi;
 import br.com.Kofflix.KFX.service.ConvertDados;
@@ -22,5 +23,8 @@ public class KofflixApplication implements CommandLineRunner {
 		ConvertDados newConvert = new ConvertDados();
 		SeriesDados dads = newConvert.resultDados(json, SeriesDados.class);
 		System.out.println(dads);
+		json = consumoApi.returnDados("https://www.omdbapi.com/?t=The+Clone+Wars&season=6&episode=3&apikey=2eb803e3");
+		EpisodesDados dadsEpisodes = newConvert.resultDados(json, EpisodesDados.class);
+		System.out.println(dadsEpisodes);
 	}
 }
