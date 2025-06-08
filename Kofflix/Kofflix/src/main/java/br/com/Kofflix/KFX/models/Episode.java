@@ -7,14 +7,14 @@ import java.util.List;
 
 public class Episode {
     private String title;
-    private String Episode;
+    public String numberEpisode;
     private LocalDate ReleaseDate;
     private double Rating;
     private int Season;
 
     public Episode(Integer numberSeason, EpisodesDados dadosEpisode) {
         this.Season = numberSeason;
-        this.Episode = dadosEpisode.numberEpisode();
+        this.numberEpisode = dadosEpisode.numberEpisode();
         this.title = dadosEpisode.Title();
         try {
             if (!dadosEpisode.ReleaseDate().equalsIgnoreCase("N/A"))
@@ -43,13 +43,13 @@ public class Episode {
         this.title = title;
     }
     public String getEpisode() {
-        return Episode;
+        return numberEpisode;
     }
 
     @Override
     public String toString() {
         return
-                "Episode='" + Episode + '\'' +
+                "Episode='" + numberEpisode + '\'' +
                 ", title='" + title + '\'' +
                 ", ReleaseDate=" + ReleaseDate +
                 ", Rating=" + Rating +
@@ -57,6 +57,9 @@ public class Episode {
     }
     public LocalDate getReleaseDate() {
         return ReleaseDate;
+    }
+    public double getRating() {
+        return Rating;
     }
 
 }
