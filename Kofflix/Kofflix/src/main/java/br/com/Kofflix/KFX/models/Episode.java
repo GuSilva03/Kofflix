@@ -3,7 +3,6 @@ package br.com.Kofflix.KFX.models;
 
 
 import java.time.LocalDate;
-import java.util.List;
 
 public class Episode {
     private String title;
@@ -48,12 +47,7 @@ public class Episode {
 
     @Override
     public String toString() {
-        return
-                "Episode='" + numberEpisode + '\'' +
-                ", title='" + title + '\'' +
-                ", ReleaseDate=" + ReleaseDate +
-                ", Rating=" + Rating +
-                ", Season=" + Season ;
+        return String.format("🎬 %s (Temp. %d, Ep. %s) - Nota: %.1f", title, Season, numberEpisode, Rating);
     }
     public LocalDate getReleaseDate() {
         return ReleaseDate;
