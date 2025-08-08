@@ -11,4 +11,12 @@ public record SeasonsDados(@JsonAlias ("Season") String Season,
                            @JsonAlias ("Released") String ReleaseDate,
                            @JsonAlias ("Rating") String Rating,
                            @JsonAlias ("Title") String Title ){
+    public Integer getSeasonNumber(){
+        try {
+            return Integer.valueOf(Season);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
 }
+

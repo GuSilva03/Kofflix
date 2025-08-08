@@ -5,6 +5,7 @@ import br.com.Kofflix.KFX.repository.SerieRepository;
 import br.com.Kofflix.KFX.service.ConsumoApi;
 import br.com.Kofflix.KFX.service.ConvertDados;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.format.DateTimeFormatter;
@@ -16,7 +17,8 @@ public class Principal {
     private Scanner scann = new Scanner(System.in);
     private ConvertDados newConvert = new ConvertDados();
     private final String URL = "https://www.omdbapi.com/?t=";
-    private final String API_KEY = "&apikey=2eb803e3";
+    @Value("${api.omdb.key}")
+    private String API_KEY;
     private final ConsumoApi consumo = new ConsumoApi();
     private final SerieRepository repository;
     private List<SeasonsDados> seasonList = new ArrayList<>();
@@ -27,7 +29,10 @@ public class Principal {
     public Principal(SerieRepository repository) {
         this.repository = repository;
     }
-
+    private void listSearchSeries(){
+        List<Serie> series = repository.findAll();
+        series.stream().sorted(Comparator.comparing(Serie::getGenero)).forEach(System.out::println);
+    }
     public SeriesDados getSerie() {
         String titleSearch = getTitle();
         SeriesDados seriesData = getSeriesData(titleSearch);
@@ -49,7 +54,7 @@ public class Principal {
     }
 
     private SeriesDados getSeriesData(String title) {
-        String json = consumo.returnDados(URL + title.replace(" ", "+") + API_KEY);
+        String json = consumo.returnDados(URL + title.replace(" ", "+") + "&apikey=" + API_KEY);
         return newConvert.resultDados(json, SeriesDados.class);
     }
 
@@ -73,7 +78,8 @@ public class Principal {
     private List<SeasonsDados> getSeasons(String title, int totalSeasons) {
         List<SeasonsDados> list = new ArrayList<>();
         for (int i = 1; i <= totalSeasons; i++) {
-            String json = consumo.returnDados(URL + title.replace(" ", "+") + "&season=" + i + API_KEY);
+            String json = consumo.returnDados(URL + title.replace(" ", "+") + "&season=" + i + "&apikey=" + API_KEY);
+            System.out.println("JSON Temporada " + i + ": " + json);
             SeasonsDados dados = newConvert.resultDados(json, SeasonsDados.class);
             if (dados != null) {
                 list.add(dados);
@@ -83,9 +89,14 @@ public class Principal {
     }
 
     private List<Episode> convertSeasonToEpisode(List<SeasonsDados> seasons) {
-        return seasons.stream().flatMap(seasonsDados ->
-                seasonsDados.Episodes().stream().map(episodesDados -> new Episode(Integer.parseInt(seasonsDados.Season()), episodesDados))
-        ).collect(Collectors.toList());
+        if (seasons == null) return List.of();
+
+        return seasons.stream()
+                .filter(s -> s != null && s.Episodes() != null)
+                .flatMap(s -> s.Episodes().stream()
+                        .map(e -> new Episode(s.getSeasonNumber(), e)) // conversão EpisodesDados → Episode
+                )
+                .collect(Collectors.toList());
     }
 
     private void showEpisodesForYear(List<Episode> episodeList) {
@@ -188,6 +199,7 @@ public class Principal {
             System.out.println("3 - Buscar episódios por ano");
             System.out.println("4 - Buscar episódio por nome");
             System.out.println("5 - Ver estatísticas da série");
+            System.out.println("6 - Ver séries buscadas");
             System.out.println("0 - Voltar ao menu principal");
             System.out.print("Escolha uma opção: ");
             try {
@@ -202,8 +214,13 @@ public class Principal {
                 case 1:
                     for (SeasonsDados season : seasonList) {
                         System.out.println("\nTemporada " + season.Season() + ":");
-                        for (EpisodesDados episode : season.Episodes()) {
-                            System.out.println("- " + episode.Title());
+                        List<EpisodesDados> episodes = season.Episodes();
+                        if (episodes != null) {
+                            for (EpisodesDados episode : episodes) {
+                                System.out.println("- " + episode.Title());
+                            }
+                        } else {
+                            System.out.println("Nenhum episódio encontrado para essa temporada.");
                         }
                     }
                     break;
@@ -227,6 +244,8 @@ public class Principal {
                 case 5:
                     showStatistics(episodeList);
                     break;
+                case 6:
+                    listSearchSeries();
                 case 0:
                     System.out.println("Voltando ao menu principal...");
                     break;
@@ -239,4 +258,6 @@ public class Principal {
     public List<Episode> getEpisodeList(){
         return this.episodeList;
     }
+
+
 }

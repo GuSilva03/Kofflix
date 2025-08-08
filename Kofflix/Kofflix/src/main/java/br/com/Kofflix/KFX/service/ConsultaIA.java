@@ -6,7 +6,7 @@ import com.google.gson.*;
 import java.io.IOException;
 
 public class ConsultaIA {
-    private static final String API_KEY = "mYJRl5MysZ6bbzvPF28GnbY4TQjzS3aM1hanp1wv";
+    private static final String API_KEY = "&apikey=" + System.getenv("API_IA_KEY");
     private static final String URL = "https://api.cohere.ai/v1/chat";
 
     public static String obterTraducao(String texto) {

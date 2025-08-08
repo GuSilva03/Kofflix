@@ -18,7 +18,6 @@ public class KofflixApplication implements CommandLineRunner {
     public static void main(String[] args) {
         SpringApplication.run(KofflixApplication.class, args);
     }
-
     @Override
     public void run(String... args) throws Exception {
         SeriesDados seriesDados = principal.getSerie();
